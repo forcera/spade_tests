@@ -66,9 +66,6 @@ RUN DEBIAN_FRONTEND="noninteractive" \
     rm -rf /var/lib/apt/lists/* && \
     python3 <(curl https://bootstrap.pypa.io/get-pip.py) && \
     pip3 install --no-cache-dir -r ./framework/requirements.txt && \
-    apt-add-repository ppa:mosquitto-dev/mosquitto-ppa && \
-    apt-get install -y mosquitto=2.0.20-0mosquitto1~focal1 && \
-    apt-get install -y mosquitto-clients=2.0.20-0mosquitto1~focal1 && \
-    chmod +x ./framework/start.sh  
+    chmod +x ./framework/start.sh
 
 ENTRYPOINT ["python3", "-u","./framework/spade_drone_module.py"]
