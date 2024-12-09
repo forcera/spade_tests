@@ -42,6 +42,11 @@ class rtsp_processing:
         self.mqtt_client = mqtt.Client()  #mqtt client
         self.message_queue = queue.Queue(maxsize=50)
 
+        #stream data
+        self.stream_fps = 30  # average frame rate of the video capture
+        self.stream_width = 1280  # width of the video capture
+        self.stream_height = 720  # height of the video capture
+
         #redis configurations to save the frames
         self.full_sigmund = np.zeros((self.stream_height, self.stream_width, 3)) #no signal screen image
         self.full_sigmund = self.add_text_image(self.full_sigmund, f'NO SIGNAL', (30, 30), 0.5, color=(255, 255, 255))  #add text to the no signal screen image
