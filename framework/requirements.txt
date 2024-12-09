@@ -1,0 +1,21 @@
+# Copyright (c) 2024 FORCERA, LDA
+# 
+# This program and the accompanying materials are made available under the
+# terms of the Eclipse Public License 2.0 which is available at
+# http://www.eclipse.org/legal/epl-2.0.
+# 
+# SPDX-License-Identifier: EPL-2.0
+
+asyncpg==0.29.0
+av==12.2.0
+fastapi==0.111.1
+numpy==1.24.4
+opencv_python==4.10.0.84
+paho_mqtt==2.1.0
+psycopg2-binary==2.9.9
+python-dotenv==1.0.1
+uvicorn==0.30.3
+parrot-olympe==7.7.4
+opencv-python-headless==4.10.0.84
+redis==5.0.8
+PyGObject

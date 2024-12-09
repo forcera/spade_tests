@@ -1,0 +1,62 @@
+# Copyright (c) 2024 FORCERA, LDA
+# 
+# This program and the accompanying materials are made available under the
+# terms of the Eclipse Public License 2.0 which is available at
+# http://www.eclipse.org/legal/epl-2.0.
+# 
+# SPDX-License-Identifier: EPL-2.0
+
+services:
+  mqtt:
+    image: eclipse-mosquitto:latest
+    hostname: mosquitto
+    restart: unless-stopped
+    ports:
+      - "9001:9001"
+      - "1883:1883"
+    environment:
+        - LOCAL_MQTT_BROKER=${LOCAL_MQTT_BROKER:-mosquitto}
+        - MQTT_PORT=${MQTT_PORT:-1883}
+        - DRONE_MQTT_TOPIC=${DRONE_MQTT_TOPIC:-drone/telemetry_data}
+    volumes:
+      - ./mosquitto:/etc/mosquitto
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    command: redis-server
+    container_name: spade_redis_1
+
+  framework:
+    build: ./framework
+    environment:
+      - FRAMEWORK_CONNECT_HW=${FRAMEWORK_CONNECT_HW:-drone}
+      - FRAMEWORK_LOCAL_MQTT_BROKER=${FRAMEWORK_LOCAL_MQTT_BROKER:-mosquitto}
+      - FRAMEWORK_MQTT_PORT=${FRAMEWORK_MQTT_PORT:-1883}
+      - FRAMEWORK_DRONE_MQTT_TOPIC=${FRAMEWORK_DRONE_MQTT_TOPIC:-drone/telemetry_data}
+      - FRAMEWORK_DRONE_CAMERA_TOPIC=${FRAMEWORK_DRONE_CAMERA_TOPIC:-drone/camera_info}
+      - FRAMEWORK_HW_IP=${FRAMEWORK_HW_IP:-10.202.0.1}
+      - FRAMEWORK_TELEMETRY_SAMPLING_TIME=${FRAMEWORK_TELEMETRY_SAMPLING_TIME:-5}
+      - FRAMEWORK_FREE_FLIGHT_FLAG=${FRAMEWORK_FREE_FLIGHT_FLAG:-True}
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    depends_on:
+      - mqtt
+      - redis
+
+  spade_restream:
+    build: ./spade_restream
+    environment:
+      - FRAMEWORK_LOCAL_MQTT_BROKER=${FRAMEWORK_LOCAL_MQTT_BROKER:-mosquitto}
+      - FRAMEWORK_MQTT_PORT=${FRAMEWORK_MQTT_PORT:-1883}
+      - FRAMEWORK_DRONE_MQTT_TOPIC=${FRAMEWORK_DRONE_MQTT_TOPIC:-drone/telemetry_data}
+    ports:
+      - "31415:31415"
+    depends_on:
+      - mqtt
+      - redis
+   
