@@ -43,7 +43,7 @@ class rtsp_processing:
         self.mqtt_client = mqtt.Client()  #mqtt client
         self.message_queue = queue.Queue(maxsize=50)
         self.renderer = None
-        
+
         #stream data
         self.stream_fps = 30  # average frame rate of the video capture
         self.stream_width = 1280  # width of the video capture
@@ -128,7 +128,7 @@ class rtsp_processing:
 
         #start video streaming
         self.hardware_obj.drone.streaming.start()
-        self.renderer = PdrawRenderer(pdraw=self.skyctrl.streaming)
+        self.renderer = PdrawRenderer(pdraw=self.hardware_obj.drone.streaming)
         processing_thread.start()
 
     def offline_mode(self, stream_flag_event):
