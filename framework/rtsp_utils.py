@@ -7,6 +7,7 @@
 # SPDX-License-Identifier: EPL-2.0
 
 import olympe
+from olympe.video.renderer import PdrawRenderer
 import threading
 import cv2
 import av
@@ -41,7 +42,8 @@ class rtsp_processing:
         }
         self.mqtt_client = mqtt.Client()  #mqtt client
         self.message_queue = queue.Queue(maxsize=50)
-
+        self.renderer = None
+        
         #stream data
         self.stream_fps = 30  # average frame rate of the video capture
         self.stream_width = 1280  # width of the video capture
@@ -65,9 +67,10 @@ class rtsp_processing:
         offline_flag = False  # flag to monitor the evolution of the event state
         last_telemetry = 'waiting telemetry data...'  # variable to update when no message has been received prior to last update
         while not offline_flag:
-            try:
-                yuv_frame = self.frame_queue.get(timeout=0.1)
-            except queue.Empty:
+            if not self.frame_queue.empty():
+                yuv_frame = self.frame_queue.get()
+                print('oi')
+            else:
                 continue
 
             offline_flag = stream_flag_event.is_set()  # upodate the flag with the current state
@@ -125,6 +128,7 @@ class rtsp_processing:
 
         #start video streaming
         self.hardware_obj.drone.streaming.start()
+        self.renderer = PdrawRenderer(pdraw=self.skyctrl.streaming)
         processing_thread.start()
 
     def offline_mode(self, stream_flag_event):
