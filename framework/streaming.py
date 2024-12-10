@@ -89,22 +89,21 @@ class OlympeStreaming(threading.Thread):
 
     def run(self):
         while True:
-            with self.flush_queue_lock:
-                try:
-                    print('frame acquire')
-                    yuv_frame = self.frame_queue.get()
-                except queue.Empty:
-                    continue
-                try:
-                    print(yuv_frame)
-                    self.display_frame(yuv_frame)
-                except Exception as e:
-                    print(e)
-                finally:
-                    # Don't forget to unref the yuv frame. We don't want to
-                    # starve the video buffer pool
-                    print('unref')
-                    yuv_frame.unref()
+            try:
+                print('frame acquire')
+                yuv_frame = self.frame_queue.get()
+            except queue.Empty:
+                continue
+            try:
+                print(yuv_frame)
+                self.display_frame(yuv_frame)
+            except Exception as e:
+                print(e)
+            finally:
+                # Don't forget to unref the yuv frame. We don't want to
+                # starve the video buffer pool
+                print('unref')
+                yuv_frame.unref()
 
 
 #logger = logging.getLogger(__name__)
