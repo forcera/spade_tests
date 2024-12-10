@@ -94,35 +94,44 @@ class OlympeStreaming(threading.Thread):
         while main_thread.is_alive():
             with self.flush_queue_lock:
                 try:
-                    yuv_frame = self.frame_queue.get(timeout=0.01)
+                    yuv_frame = self.frame_queue.get()
                 except queue.Empty:
                     continue
                 try:
+                    print('frame')
                     self.display_frame(yuv_frame)
                 except Exception as e:
                     print(e)
                 finally:
                     # Don't forget to unref the yuv frame. We don't want to
                     # starve the video buffer pool
+                    print('unref')
                     yuv_frame.unref()
 
 
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # eventually IP will be specified depending on what drone is chosen
+    olympe.log.update_config({"loggers": {"olympe": {"level": "WARNING"}}})
     IP = "10.202.0.1"
     drone = olympe.Drone(IP)
     drone.connect()
-    drone(TakeOff()).wait().success()
+    drone(olympe.messages.ardrone3.PilotingState.FlyingStateChanged(state="hovering", _policy="check")
+                                    | olympe.messages.ardrone3.PilotingState.FlyingStateChanged(state="flying", _policy="check")
+                                    | (olympe.messages.ardrone3.GPSSettingsState.GPSFixStateChanged(fixed=1, _timeout=10, _policy="check_wait")
+                                       >> (olympe.messages.ardrone3.Piloting.TakeOff(_no_expect=True) & olympe.messages.ardrone3.PilotingState.FlyingStateChanged(state="hovering", _timeout=10,
+                                                                                         _policy="check_wait")))).wait()
+    print('[drone_utils.flight_control] Drone took off!')
 
     streamer = OlympeStreaming(drone)
     streamer.start()
 
     ### Flight commands here ###
-    time.sleep(300)
+    time.sleep(60)
 
     streamer.stop()
 
-    drone(Landing()).wait().success()
+    drone(olympe.messages.ardrone3.Piloting.Landing() >> olympe.messages.ardrone3.PilotingState.FlyingStateChanged(state="landed")).wait().success()
+
     drone.disconnect()
