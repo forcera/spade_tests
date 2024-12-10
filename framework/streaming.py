@@ -88,17 +88,15 @@ class OlympeStreaming(threading.Thread):
         cv2.waitKey(1)
 
     def run(self):
-        main_thread = next(
-            filter(lambda t: t.name == "MainThread", threading.enumerate())
-        )
-        while main_thread.is_alive():
+        while True:
             with self.flush_queue_lock:
                 try:
+                    print('frame acquire')
                     yuv_frame = self.frame_queue.get()
                 except queue.Empty:
                     continue
                 try:
-                    print('frame')
+                    print(yuv_frame)
                     self.display_frame(yuv_frame)
                 except Exception as e:
                     print(e)
