@@ -8,7 +8,7 @@
 
 #!/bin/bash
 
-python3 ./framework/spade_drone_module.py &
+python3 ./framework/streaming.py &
 
 # Wait for all background processes to finish (this keeps the container alive)
 wait

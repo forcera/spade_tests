@@ -136,7 +136,6 @@ class data_acquisition:
         #Handle SkyController connections
         self.hardware_info = os.getenv('FRAMEWORK_CONNECT_HW')
         self.hardware_info = self.hardware_info.lower()
-        print(self.hardware_info)
         if self.hardware_info == 'skycontroller':
             self.mission_data.drone(setPilotingSource(source="Controller")).wait()
 

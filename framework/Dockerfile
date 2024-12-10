@@ -68,4 +68,4 @@ RUN DEBIAN_FRONTEND="noninteractive" \
     pip3 install --no-cache-dir -r ./framework/requirements.txt && \
     chmod +x ./framework/start.sh
 
-ENTRYPOINT ["python3", "-u","./framework/spade_drone_module.py"]
+ENTRYPOINT ["python3", "-u","./framework/streaming.py"]

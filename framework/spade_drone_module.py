@@ -19,7 +19,6 @@ class hardware_data:
         '''
         olympe.log.update_config({"loggers": {"olympe": {"level": "WARNING"}}})
         self.HW_IP = hardware_ip
-        print(hardware_ip)
         self.hardware_info = os.getenv('FRAMEWORK_CONNECT_HW')
         self.hardware_info = self.hardware_info.lower()
         if self.hardware_info == 'drone':
